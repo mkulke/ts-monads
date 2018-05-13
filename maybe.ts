@@ -4,17 +4,17 @@ enum MaybeKind {
 }
 
 interface Some<T> {
-  kind: MaybeKind.Some;
-  val: T;
+  readonly kind: MaybeKind.Some;
+  readonly val: T;
 }
 
 interface None {
-  kind: MaybeKind.None;
+  readonly kind: MaybeKind.None;
 }
 
 type Maybe<T> = Some<T> | None;
 
-function some<T>(val: T): Maybe<T> {
+function some<T>(val: T): Some<T> {
   return { kind: MaybeKind.Some, val };
 }
 
@@ -42,4 +42,15 @@ function flatten<T>(some: Some<T>): T {
   return some.val;
 }
 
-export { Some, Maybe, isSome, some, none, withDefault, flatMap, map, flatten };
+export {
+  Some,
+  None,
+  Maybe,
+  isSome,
+  some,
+  none,
+  withDefault,
+  flatMap,
+  map,
+  flatten,
+};
