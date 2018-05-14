@@ -23,8 +23,8 @@ function head<T>(list: List<T>): Maybe.Maybe<T> {
   return Maybe.map(entry => entry.val, list);
 }
 
-function tail<T>(list: List<T>): Maybe.Maybe<List<T>> {
-  return Maybe.map(entry => entry.next, list);
+function tail<T>(list: List<T>): List<T> {
+  return Maybe.flatMap(entry => entry.next, list);
 }
 
 function concat<T>(b: List<T>, a: List<T>): List<T> {
@@ -55,45 +55,30 @@ function toString<T>(list: List<T>): string {
         : `${entry.val}, ${toString(entry.next)}`,
     list,
   );
+
   return Maybe.withDefault('', maybe);
 }
 
-function flatMap2<T, U>(fn: (val: T) => List<U>, list: List<T>): List<U> {
-  if (isEmpty(list)) {
-    return list;
-  }
-
-  const entry = list.val;
-  const innerList = fn(entry.val);
-  const mgns = flatMap2(fn, entry.next);
-  return concat(innerList, mgns);
-}
-
 function flatMap<T, U>(fn: (val: T) => List<U>, list: List<T>): List<U> {
-  return flatten(map(fn, list));
+  return Maybe.flatMap(entry => {
+    const innerList = fn(entry.val);
+    const rest = flatMap(fn, entry.next);
+    return concat(rest, innerList);
+  }, list);
 }
 
 function map<T, U>(fn: (val: T) => U, list: List<T>): List<U> {
-  return Maybe.map(entry => {
-    const val = fn(entry.val);
-    const next = map(fn, entry.next);
-    return { val, next };
-  }, list);
+  return flatMap(x => of(fn(x)), list);
 }
 
 function flatten<T>(list: List<List<T>>): List<T> {
-  return Maybe.flatMap(entry => {
-    const innerList = entry.val;
-    const next = entry.next;
-    return concat(flatten(next), innerList);
-  }, list);
+  return flatMap(x => x, list);
 }
 
 export {
   List,
   map,
   flatMap,
-  flatMap2,
   flatten,
   concat,
   append,
