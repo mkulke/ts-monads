@@ -26,7 +26,11 @@ function isSome<T>(maybe: Maybe<T>): maybe is Some<T> {
   return maybe.kind === MaybeKind.Some;
 }
 
-function withDefault<T>(maybe: Maybe<T>, def: T): T {
+function orElse<T>(elseMaybe: Maybe<T>, maybe: Maybe<T>): Maybe<T> {
+  return isSome(maybe) ? maybe : elseMaybe;
+}
+
+function withDefault<T>(def: T, maybe: Maybe<T>): T {
   return isSome(maybe) ? flatten(maybe) : def;
 }
 
@@ -49,6 +53,7 @@ export {
   isSome,
   some,
   none,
+  orElse,
   withDefault,
   flatMap,
   map,
