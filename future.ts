@@ -26,7 +26,7 @@ function fork<T, U>(
 }
 
 function map<T, U, V>(fn: (val: U) => V, fut: Future<T, U>): Future<T, V> {
-  return future((rj, rs) => fut.fn(rj, val => rs(fn(val))));
+  return flatMap(x => resolve(fn(x)), fut);
 }
 
 function flatMap<T, U, V>(

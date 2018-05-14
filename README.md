@@ -1,9 +1,9 @@
 # ts-monads
 
-* typesafe monads
-* written in typescript
-* very barebone
-* maybe, result & future
+* several monads, written in typescript
+* very barebone, for exploration around types
+* not for actual usage
+* maybe, list, result & future
 
 ## install & compile
 
