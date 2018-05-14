@@ -26,8 +26,8 @@ function testEqual<T>(a: List<T>, b: List<T>): void {
     return;
   }
 
-  const x = Maybe.flatten(a);
-  const y = Maybe.flatten(b);
+  const x = a.val;
+  const y = a.val;
   assert(x.val === y.val);
   return testEqual(x.next, y.next);
 }
@@ -74,17 +74,3 @@ const g = byFour;
 // Associativity: m.bind(f).bind(g) === m.bind(x => f(x).bind(g))
 // flatMap(g, flatMap(f, m)) === flatMap(x => flatMap(g, f(x)), m);
 testEqual(flatMap(g, flatMap(f, m)), flatMap(x => flatMap(g, f(x)), m));
-
-// const x = of(2);
-// const y = of(3);
-// const z = concat(x, y);
-// print(c);
-// const c_c = concat(of(c), empty());
-// print(flatten(c_c));
-// const b = of(3);
-// const c = concat(b, a);
-console.log('mgns %s', toString(map(u => u > 2, z)));
-console.log('mgns %s', toString(flatMap(u => concat(of(u + 1), of(u)), z)));
-// print(c);
-// const d = of(true);
-// const e = concat<number | boolean>(c, d);
