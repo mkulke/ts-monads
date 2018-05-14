@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 function testEqual<T>(a: Result<T>, b: Result<T>): void {
   if (isOk(a) && isOk(b)) {
-    assert(flatten(a) === flatten(b));
+    assert(a.val === b.val);
     console.log('test passed');
     return;
   }

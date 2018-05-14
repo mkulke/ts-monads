@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 function testEqual<T>(a: Maybe<T>, b: Maybe<T>): void {
   if (isSome(a) && isSome(b)) {
-    assert(flatten(a) === flatten(b));
+    assert(a.val === b.val);
     console.log('test passed');
     return;
   }

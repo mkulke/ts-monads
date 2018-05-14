@@ -4,17 +4,17 @@ enum MaybeKind {
 }
 
 interface Some<T> {
-  kind: MaybeKind.Some;
-  val: T;
+  readonly kind: MaybeKind.Some;
+  readonly val: T;
 }
 
 interface None {
-  kind: MaybeKind.None;
+  readonly kind: MaybeKind.None;
 }
 
 type Maybe<T> = Some<T> | None;
 
-function some<T>(val: T): Maybe<T> {
+function some<T>(val: T): Some<T> {
   return { kind: MaybeKind.Some, val };
 }
 
@@ -26,20 +26,36 @@ function isSome<T>(maybe: Maybe<T>): maybe is Some<T> {
   return maybe.kind === MaybeKind.Some;
 }
 
-function withDefault<T>(maybe: Maybe<T>, def: T): T {
-  return isSome(maybe) ? flatten(maybe) : def;
+function orElse<T>(elseMaybe: Maybe<T>, maybe: Maybe<T>): Maybe<T> {
+  return isSome(maybe) ? maybe : elseMaybe;
+}
+
+function withDefault<T>(def: T, maybe: Maybe<T>): T {
+  return isSome(maybe) ? maybe.val : def;
 }
 
 function flatMap<T, U>(fn: (val: T) => Maybe<U>, maybe: Maybe<T>): Maybe<U> {
-  return isSome(maybe) ? fn(flatten(maybe)) : maybe;
+  return isSome(maybe) ? fn(maybe.val) : none();
 }
 
 function map<T, U>(fn: (val: T) => U, maybe: Maybe<T>): Maybe<U> {
-  return isSome(maybe) ? some(fn(flatten(maybe))) : maybe;
+  return flatMap(x => some(fn(x)), maybe);
 }
 
-function flatten<T>(some: Some<T>): T {
-  return some.val;
+function flatten<T>(maybe: Maybe<Maybe<T>>): Maybe<T> {
+  return flatMap(x => x, maybe);
 }
 
-export { Some, Maybe, isSome, some, none, withDefault, flatMap, map, flatten };
+export {
+  Some,
+  None,
+  Maybe,
+  isSome,
+  some,
+  none,
+  orElse,
+  withDefault,
+  flatMap,
+  map,
+  flatten,
+};

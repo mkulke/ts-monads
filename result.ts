@@ -28,15 +28,15 @@ function isOk<T>(val: Result<T>): val is Ok<T> {
 }
 
 function flatMap<T, U>(fn: (val: T) => Result<U>, res: Result<T>): Result<U> {
-  return isOk(res) ? fn(flatten(res)) : res;
+  return isOk(res) ? fn(res.val) : res;
 }
 
 function map<T, U>(fn: (val: T) => U, res: Result<T>): Result<U> {
-  return isOk(res) ? ok(fn(flatten(res))) : res;
+  return flatMap(x => ok(fn(x)), res);
 }
 
-function flatten<T>(ok: Ok<T>): T {
-  return ok.val;
+function flatten<T>(res: Result<Result<T>>): Result<T> {
+  return flatMap(x => x, res);
 }
 
 export { Result, map, flatMap, flatten, isOk, ok, err };
