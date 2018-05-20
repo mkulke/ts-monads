@@ -2,8 +2,8 @@
 
 * several monads, written in typescript
 * very barebone, for exploration around types
-* not for actual usage
-* maybe, list, result & future
+* do not use for anything
+* maybe, list, result, future & reader
 
 ## install & compile
 
