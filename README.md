@@ -31,6 +31,20 @@ const three = flatMap(byThree, two);
 fork(console.error, console.log, three);
 ```
 
+## examples
+
+### reader
+
+provide request context in web service layers via reader monad and iterator functions.
+
+```bash
+node dist/examples/server.js
+```
+
+```bash
+curl "http://localhost:3000?number=9" -H "X-Cid: 123"
+```
+
 ## test
 
 ```bash
