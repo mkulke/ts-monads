@@ -3,7 +3,7 @@
 * several monads, written in typescript
 * very barebone, for exploration around types
 * do not use for anything
-* maybe, list, result, future & reader
+* maybe, list, result, future, reader & state
 
 ## install & compile
 
@@ -32,6 +32,12 @@ fork(console.error, console.log, three);
 ```
 
 ## examples
+
+### state
+
+```bash
+node dist/examples/mining.js
+```
 
 ### reader
 
