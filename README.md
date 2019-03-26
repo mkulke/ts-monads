@@ -15,16 +15,16 @@ $(npm bin)/tsc
 ## usage
 
 ```typescript
-import { Future, future, map, flatMap, fork } from './future';
+import { Future, map, flatMap, fork } from './future';
 
-const one: Future<Error, number> = future((_rej, res) => {
+const one: Future<Error, number> = (_rej, res) => {
   setTimeout(() => res(10), 1000);
 });
 
 const byThree = (val: number): Future<Error, number> =>
-  future((_rej, res) => {
+  (_rej, res) => {
     setTimeout(() => res(val * 3), 300);
-  });
+  };
 
 const two = map(x => x * 2, one);
 const three = flatMap(byThree, two);
