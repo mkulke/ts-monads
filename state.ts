@@ -18,7 +18,7 @@ function map<U, V, S>(
   return flatMap(x => of(fn(x)), program);
 }
 
-function of<U, S>(u: U): (s: S) => [U, S] {
+function of<U, S>(u: U): Program<U, S> {
   return (state: S) => [u, state];
 }
 
