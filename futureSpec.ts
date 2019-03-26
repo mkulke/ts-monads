@@ -1,4 +1,4 @@
-import { Future, map, flatMap, fork, future, resolve } from './future';
+import { Future, map, flatMap, fork, resolve } from './future';
 import * as assert from 'assert';
 
 function testError<Error, U>(a: Future<Error, U>, message: string): void {
@@ -27,24 +27,21 @@ function testEqual<T, U>(a: Future<T, U>, b: Future<T, U>): void {
   );
 }
 
-const byThree = (val: number): Future<Error, number> =>
-  future((_rej, res) => {
-    setTimeout(() => res(val * 3), 300);
-  });
+const byThree = (val: number): Future<Error, number> => (_rej, res) => {
+  setTimeout(() => res(val * 3), 300);
+};
 
-const byFour = (val: number): Future<Error, number> =>
-  future((_rej, res) => {
-    setTimeout(() => res(val * 4), 400);
-  });
+const byFour = (val: number): Future<Error, number> => (_rej, res) => {
+  setTimeout(() => res(val * 4), 400);
+};
 
-const err = (val: number): Future<Error, number> =>
-  future(rej => {
-    setTimeout(() => rej(new Error('Timeout')), 500);
-  });
+const err = (val: number): Future<Error, number> => rej => {
+  setTimeout(() => rej(new Error('Timeout')), 500);
+};
 
-const one: Future<Error, number> = future((_rej, res) => {
+const one: Future<Error, number> = (_rej, res) => {
   setTimeout(() => res(10), 1000);
-});
+};
 
 // map & flatMap
 

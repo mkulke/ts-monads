@@ -1,43 +1,31 @@
-type ResolveFn<T> = (t: T) => void;
-type RejectFn<T> = ResolveFn<T>;
-type FutureFn<T, U> = (rj: RejectFn<T>, rs: ResolveFn<U>) => void;
-interface Future<T, U> {
-  fn: FutureFn<T, U>;
-}
+type Handler<T> = (t: T) => void;
+type Future<T, U> = (reject: Handler<T>, resolve: Handler<U>) => void;
 
-function future<T, U>(fn: FutureFn<T, U>): Future<T, U> {
-  return { fn };
-}
-
-function resolve<T, U>(val: U): Future<T, U> {
-  return future((_rj, rs) => rs(val));
+function of<T, U>(val: U): Future<T, U> {
+  return (_rej, res) => res(val);
 }
 
 function reject<T, U>(val: T): Future<T, U> {
-  return future((rj, _rs) => rj(val));
+  return (rej, _res) => rej(val);
 }
 
-function fork<T, U>(
-  rj: RejectFn<T>,
-  rs: ResolveFn<U>,
-  future: Future<T, U>,
-): void {
-  future.fn(rj, rs);
+function fork<T, U>(rej: Handler<T>, res: Handler<U>, fut: Future<T, U>): void {
+  fut(rej, res);
 }
 
-function map<T, U, V>(fn: (val: U) => V, fut: Future<T, U>): Future<T, V> {
-  return flatMap(x => resolve(fn(x)), fut);
+function map<T, U, V>(fn: (val: U) => V, future: Future<T, U>): Future<T, V> {
+  return flatMap(x => of(fn(x)), future);
 }
 
-function flatMap<T, U, V>(
+function flatMap<U, V, T>(
   fn: (val: U) => Future<T, V>,
   fut: Future<T, U>,
 ): Future<T, V> {
-  return future((rj, rs) => fut.fn(rj, val => fork(rj, rs, fn(val))));
+  return (rej, res) => fut(rej, val => fork(rej, res, fn(val)));
 }
 
 function flatten<T, U>(fut: Future<T, Future<T, U>>): Future<T, U> {
   return flatMap(x => x, fut);
 }
 
-export { Future, flatten, flatMap, fork, future, map, reject, resolve };
+export { Future, flatten, flatMap, fork, map, reject, of, of as resolve };
