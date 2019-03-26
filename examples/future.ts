@@ -24,12 +24,18 @@ class FutureMonad<T, U> {
       monads.forEach((monad, idx) => {
         monad.future(
           err => {
-            if (!rejected) {
-              rej(err);
+            if (rejected) {
+              return;
             }
+
             rejected = true;
+            rej(err);
           },
           val => {
+            if (rejected) {
+              return;
+            }
+
             resolved[idx] = val;
             const keys = Object.keys(resolved);
             if (keys.length === monads.length) {
