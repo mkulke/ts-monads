@@ -11,6 +11,38 @@ class FutureMonad<T, U> {
   map<V>(fn: (val: U) => V): FutureMonad<T, V> {
     return this.flatMap(x => of(fn(x)));
   }
+
+  static all<T, U>(monads: FutureMonad<T, U>[]): FutureMonad<T, U[]> {
+    if (monads.length === 0) {
+      return new FutureMonad(of([]));
+    }
+
+    const fut = (rej: (e: T) => void, res: (u: U[]) => void) => {
+      const resolved: Record<number, U> = {};
+
+      let rejected = false;
+      monads.forEach((monad, idx) => {
+        monad.future(
+          err => {
+            if (!rejected) {
+              rej(err);
+            }
+            rejected = true;
+          },
+          val => {
+            resolved[idx] = val;
+            const keys = Object.keys(resolved);
+            if (keys.length === monads.length) {
+              const values = Object.values(resolved);
+              res(values);
+            }
+          },
+        );
+      });
+    };
+
+    return new FutureMonad(fut);
+  }
 }
 
 function getUsers(rej: (e: Error) => void, res: (s: string) => void): void {
@@ -79,10 +111,34 @@ function parseUser(user: any): Future<Error, number> {
   return of(id);
 }
 
+function getUserById(id: number): Future<Error, string> {
+  return (rej, res) => {
+    get(`https://jsonplaceholder.typicode.com/users/${id}`, resp => {
+      let data = '';
+
+      const { statusCode } = resp;
+      if (statusCode !== 200) {
+        rej(new Error(`StatusCode: ${statusCode}`));
+        return;
+      }
+
+      resp.on('data', chunk => (data += chunk));
+      resp.on('end', () => res(data));
+    }).on('error', rej);
+  };
+}
+
 new FutureMonad(getUsers)
   .flatMap(parseBody)
   .flatMap(parseList)
   .map(pickRandom)
   .flatMap(parseUser)
   .flatMap(getPostsByUserId)
+  .future(console.error, console.log);
+
+const f1 = new FutureMonad(getUserById(3));
+const f2 = new FutureMonad(getUserById(4));
+FutureMonad.all([f1, f2])
+  .map(bodies => bodies.map(body => JSON.parse(body)))
+  .map(json => JSON.stringify(json, null, 2))
   .future(console.error, console.log);
